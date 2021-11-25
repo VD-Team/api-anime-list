@@ -33,7 +33,24 @@ server.get('/users', (req, res) => {
 })
 
 server.post('/users', (req, res) => {
-    res.send('Saving a new user')
+    try {
+        let form = new formidable.IncomingForm()
+        form.parse(req, (err, fields, files) => {
+            if (err) throw "Error on parsing"
+            let person = new Person(fields)
+            let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
+            databaseConnection.connect()
+            databaseConnection.query(query, (err, result) => {
+                if (err) throw "Error whent it is saving data on database"
+            })
+            databaseConnection.end()
+            res.redirect('/login')
+        })
+    } catch (error) {
+        res.send({
+            error
+        })
+    }
 })
 
 server.put('/users', (req, res) => {
