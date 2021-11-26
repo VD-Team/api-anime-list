@@ -2,50 +2,56 @@ const server = require('./server')
 const port = process.env.PORT || 3000
 
 const databaseConnection = require('./database/database')
-const formidable = require('formidable')
 
 server.listen(port, () => console.log(`Server listing in port ${port}`))
 
 // ******************* Users *******************
 server.get('/users', (req, res) => {
-    try {
-        let id = req.query.id
-        if (id == undefined) throw "Id not specified"
-        databaseConnection.query('SELECT * FROM person', (error, results) => {
-            if (error) throw "User not found"
-            if (results == undefined) throw "User not found"
-            let found = false
-            for (let i = 0; i < results.length; i++) {
-                const person = results[i];
-                if (person.id == id) {
-                    res.send(new Person(person))
-                    found = true
+    let error = undefined;
+    let id = req.query.id
+    if (id == undefined) {
+        error = "Id not specified"
+    }else{
+        databaseConnection.connect()
+        try {
+            databaseConnection.query('SELECT * FROM person', (error, results) => {
+                let found = false
+                if (!error && results) {
+                    for (let i = 0; i < results.length; i++) {
+                        const person = results[i];
+                        if (person.id == id) {
+                            console.log(person.id)
+                            res.send(new Person(person))
+                            found = true
+                        }
+                    }
                 }
-            }
-            if (!found) throw "User not found"
-        })
+                if (!found){
+                    error = "User not found"
+                }
+            })
+        }catch(e) {
+            res.send({error: "User not found"})
+        }
         databaseConnection.end()
-    } catch (error) {
-        res.send({
-            error
-        })
+    }
+    if (error){
+        res.send({error})
     }
 })
 
 server.post('/users', (req, res) => {
     try {
-        let form = new formidable.IncomingForm()
-        form.parse(req, (err, fields, files) => {
-            if (err) throw "Error on parsing"
-            let person = new Person(fields)
-            let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
-            databaseConnection.connect()
-            databaseConnection.query(query, (err, result) => {
-                if (err) throw "Error whent it is saving data on database"
-            })
-            databaseConnection.end()
-            res.redirect('/login')
+        let data = req.body
+        if (!data) throw "Error of data not specified"
+        let person = new Person(data)
+        let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
+        databaseConnection.connect()
+        databaseConnection.query(query, (err, result) => {
+            if (err) throw "Error whent it is saving data on database"
         })
+        databaseConnection.end()
+        res.send(person)
     } catch (error) {
         res.send({
             error
