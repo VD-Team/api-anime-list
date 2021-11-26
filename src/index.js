@@ -48,9 +48,9 @@ server.post('/users', (req, res) => {
         let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
         databaseConnection.connect()
         databaseConnection.query(query, (err, result) => {
+            databaseConnection.end()
             if (err) throw "Error whent it is saving data on database"
         })
-        databaseConnection.end()
         res.send(person)
     } catch (error) {
         res.send({
