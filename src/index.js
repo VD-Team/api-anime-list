@@ -13,7 +13,6 @@ server.post('/login', (req, res) => {
     if (email == undefined || password) {
         error = "Id not specified"
     }else{
-        databaseConnection.connect()
         try {
             databaseConnection.query('SELECT * FROM person', (error, results) => {
                 let found = false
@@ -33,7 +32,6 @@ server.post('/login', (req, res) => {
         }catch(e) {
             res.send({error: "User not found"})
         }
-        databaseConnection.end()
     }
     if (error){
         res.send({error})
@@ -46,9 +44,7 @@ server.post('/users', (req, res) => {
         if (!data) throw "Error of data not specified"
         let person = new Person(data)
         let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
-        databaseConnection.connect()
         databaseConnection.query(query, (err, result) => {
-            databaseConnection.end()
             if (err) throw "Error whent it is saving data on database"
         })
         res.send(person)
