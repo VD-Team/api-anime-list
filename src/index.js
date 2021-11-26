@@ -1,7 +1,10 @@
 const server = require('./server')
+const model = require('./model')
 const port = process.env.PORT || 3000
 
 const databaseConnection = require('./database/database')
+const { commit } = require('./database/database')
+const { get } = require('./server')
 
 server.listen(port, () => console.log(`Server listing in port ${port}`))
 
@@ -20,7 +23,7 @@ server.post('/login', (req, res) => {
                     for (let i = 0; i < results.length; i++) {
                         const person = results[i];
                         if (person.email == email && person.password == password) {
-                            res.send(new Person(person))
+                            res.send(new model.Person(person))
                             found = true
                         }
                     }
@@ -42,7 +45,7 @@ server.post('/users', (req, res) => {
     try {
         let data = req.body
         if (!data) throw "Error of data not specified"
-        let person = new Person(data)
+        let person = new model.Person(data)
         let query = `INSERT INTO person (name, email, password, genre, confirmation) VALUES ('${person.name}', '${person.email}', '${person.password}', '${person.genre}', ${person.confirmation})`
         databaseConnection.query(query, (err, result) => {
             if (err) throw "Error whent it is saving data on database"
@@ -56,20 +59,26 @@ server.post('/users', (req, res) => {
     }
 })
 
+// TODO: PUT Request 
 server.put('/users', (req, res) => {
     res.send('Updating a new user')
 })
 
 // ******************* Favorites *******************
 
+server.get('/anime', (req, res) => {
+    let { userId, animeUrl } = req.query
+    res.send({
+        userId: Number(userId),
+        animeUrl
+    })
+})
 
-class Person {
-    constructor(data) {
-        this.id = data.id
-        this.name = data.name
-        this.email = data.email
-        this.password = data.password
-        this.genre = data.genre
-        this.confirmation = data.confirmation
+server.post('/anime', (req, res) => {
+    let animeRawData = req.body
+    try {
+        if (!animeRawData) throw "Invalid anime"
+    } catch (error) {
+        res.send({ error })
     }
-}
+})
