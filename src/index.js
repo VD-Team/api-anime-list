@@ -66,18 +66,32 @@ server.put('/users', (req, res) => {
 
 // ******************* Favorites *******************
 
-server.get('/anime', (req, res) => {
-    let { userId, animeUrl } = req.query
+server.delete('/anime', (req, res) => {
+    let { userId, id } = req.query
     res.send({
         userId: Number(userId),
-        animeUrl
+        id: Number(id)
     })
+})
+
+server.get('/animes', (req, res) => {
+    let { userId } = req.query
+    try {
+        if (userId == null) throw 'Invalid anime id'
+        res.send({
+            userId: Number(userId)
+        })
+    } catch (error) {
+        res.send({ error })
+    }
+    
 })
 
 server.post('/anime', (req, res) => {
     let animeRawData = req.body
     try {
         if (!animeRawData) throw "Invalid anime"
+        console.log(animeRawData)
     } catch (error) {
         res.send({ error })
     }
