@@ -6,7 +6,7 @@ const databaseConnection = require('./database/database')
 server.listen(port, () => console.log(`Server listing in port ${port}`))
 
 // ******************* Users *******************
-server.post('/users', (req, res) => {
+server.post('/login', (req, res) => {
     let error = undefined;
     let email = req.body.email
     let password = req.body.password
