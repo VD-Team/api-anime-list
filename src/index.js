@@ -6,10 +6,10 @@ const databaseConnection = require('./database/database')
 server.listen(port, () => console.log(`Server listing in port ${port}`))
 
 // ******************* Users *******************
-server.post('/login', (req, res) => {
+server.get('/users', (req, res) => {
     let error = undefined;
-    let email = req.body.email
-    let password = req.body.password
+    let email = req.query.email
+    let password = req.query.password
     if (email == undefined || password == undefined) {
         error = "user not specified"
     }else{
