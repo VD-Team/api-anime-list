@@ -10,8 +10,8 @@ server.post('/login', (req, res) => {
     let error = undefined;
     let email = req.body.email
     let password = req.body.password
-    if (email == undefined || password) {
-        error = "Id not specified"
+    if (email == undefined || password == undefined) {
+        error = "user not specified"
     }else{
         try {
             databaseConnection.query('SELECT * FROM person', (error, results) => {
