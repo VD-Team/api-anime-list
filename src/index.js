@@ -6,10 +6,11 @@ const databaseConnection = require('./database/database')
 server.listen(port, () => console.log(`Server listing in port ${port}`))
 
 // ******************* Users *******************
-server.get('/users', (req, res) => {
+server.post('/login', (req, res) => {
     let error = undefined;
-    let id = req.query.id
-    if (id == undefined) {
+    let email = req.body.email
+    let password = req.body.password
+    if (email == undefined || password) {
         error = "Id not specified"
     }else{
         databaseConnection.connect()
@@ -19,8 +20,7 @@ server.get('/users', (req, res) => {
                 if (!error && results) {
                     for (let i = 0; i < results.length; i++) {
                         const person = results[i];
-                        if (person.id == id) {
-                            console.log(person.id)
+                        if (person.email == email && person.password == password) {
                             res.send(new Person(person))
                             found = true
                         }
