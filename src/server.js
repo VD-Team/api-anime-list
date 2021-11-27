@@ -3,7 +3,10 @@ const app = express()
 
 app.use(express.json())
 app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');    // handle OPTIONS method
+    res.setHeader('Access-Control-Allow-Origin', 'animelist');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Credentials', true);   // handle OPTIONS method
     if ('OPTIONS' == req.method) {
         return res.sendStatus(200);
     } else {
