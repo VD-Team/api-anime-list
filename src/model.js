@@ -24,4 +24,4 @@ class Anime {
     }
 }
 
-module.exports = { Person }
+module.exports = { Person, Anime }

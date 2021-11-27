@@ -59,27 +59,39 @@ server.post('/users', (req, res) => {
     }
 })
 
-// TODO: PUT Request 
-server.put('/users', (req, res) => {
-    res.send('Updating a new user')
-})
-
 // ******************* Favorites *******************
-
 server.delete('/anime', (req, res) => {
     let { userId, id } = req.query
-    res.send({
-        userId: Number(userId),
-        id: Number(id)
-    })
+    try {
+        if (userId == null || id == null) throw 'Invalid data'
+        let query = `DELETE FROM favorito WHERE favorito.id = ${Number(id)} AND favorito.userId = ${Number(userId)}`
+        databaseConnection.query(query, (err, result) => {
+            if (err) throw "Error whent it is deleting data on database"
+            res.send({
+                userId: Number(userId),
+                id: Number(id)
+            })
+        })
+    } catch (error) {
+        res.send({ error })
+    }
+    
 })
 
 server.get('/animes', (req, res) => {
     let { userId } = req.query
     try {
         if (userId == null) throw 'Invalid anime id'
-        res.send({
-            userId: Number(userId)
+        let query = `SELECT * FROM favorito WHERE favorito.userId = ${userId}`
+        databaseConnection.query(query, (error, results, fields) => {
+            if (error) throw 'Error on quering process'
+            if (results == undefined) throw 'Results is empty'
+            let favoritos = []
+            for (let index = 0; index < results.length; index++) {
+                const favorito = results[index];
+                favoritos.push(new model.Anime(favorito))
+                res.send(favoritos)
+            }
         })
     } catch (error) {
         res.send({ error })
@@ -91,7 +103,12 @@ server.post('/anime', (req, res) => {
     let animeRawData = req.body
     try {
         if (!animeRawData) throw "Invalid anime"
-        console.log(animeRawData)
+        let anime = new model.Anime(data)
+        let query = `INSERT INTO favorito(id, userId, status, nota, startDate, endDate, progress, rewatch, title, image_url) VALUES (${anime.id}, ${anime.userId}, '${anime.status}', ${anime.nota}, ${anime.startDate}, ${anime.endDate}, ${anime.progress}, ${anime.rewatch}, '${anime.title}', '${anime.image_url}')`
+        databaseConnection.query(query, (err, result) => {
+            if (err) throw "Error whent it is saving data on database"
+            res.send(anime)
+        })
     } catch (error) {
         res.send({ error })
     }
