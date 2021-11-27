@@ -79,20 +79,30 @@ server.delete('/anime', (req, res) => {
 })
 
 server.get('/animes', (req, res) => {
-    let { userId } = req.query
+    let { userId, id } = req.query
     try {
         if (userId == null) throw 'Invalid anime id'
-        let query = `SELECT * FROM favorito WHERE favorito.userId = ${userId}`
-        databaseConnection.query(query, (error, results, fields) => {
-            if (error) throw 'Error on quering process'
-            if (results == undefined) throw 'Results is empty'
-            let favoritos = []
-            for (let index = 0; index < results.length; index++) {
-                const favorito = results[index];
-                favoritos.push(new model.Anime(favorito))
-                res.send(favoritos)
-            }
-        })
+        if (id != null) {
+            let query = `SELECT * FROM favorito WHERE favorito.userId = ${Number(userId)} AND favorito.id = ${Number(id)}`
+            databaseConnection.query(query, (error, results, fields) => {
+                if (error) throw 'Error on quering process'
+                if (results == undefined) throw 'Results is empty'
+                let favorito = results[0]
+                res.send(new model.Anime(favorito))
+            })
+        } else {
+            let query = `SELECT * FROM favorito WHERE favorito.userId = ${userId}`
+            databaseConnection.query(query, (error, results, fields) => {
+                if (error) throw 'Error on quering process'
+                if (results == undefined) throw 'Results is empty'
+                let favoritos = []
+                for (let index = 0; index < results.length; index++) {
+                    const favorito = results[index];
+                    favoritos.push(new model.Anime(favorito))
+                    res.send(favoritos)
+                }
+            })
+        }
     } catch (error) {
         res.send({ error })
     }
