@@ -114,7 +114,7 @@ server.post('/anime', (req, res) => {
     try {
         if (!animeRawData) throw "Invalid anime"
         let anime = new model.Anime(data)
-        let query = `INSERT INTO favorito(id, userId, status, nota, startDate, endDate, progress, rewatch, title, image_url) VALUES (${anime.id}, ${anime.userId}, '${anime.status}', ${anime.nota}, ${anime.startDate}, ${anime.endDate}, ${anime.progress}, ${anime.rewatch}, '${anime.title}', '${anime.image_url}')`
+        let query = `INSERT INTO favorito(id, userId, status, nota, progress, rewatch, title, image_url) VALUES (${anime.id}, ${anime.userId}, '${anime.status}', ${anime.nota}, ${anime.progress}, ${anime.rewatch}, '${anime.title}', '${anime.image_url}')`
         databaseConnection.query(query, (err, result) => {
             if (err) throw "Error whent it is saving data on database"
             res.send(anime)
